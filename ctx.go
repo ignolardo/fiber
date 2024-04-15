@@ -291,12 +291,20 @@ func (c *DefaultCtx) Body() []byte {
 func (c *DefaultCtx) ClearCookie(key ...string) {
 	if len(key) > 0 {
 		for i := range key {
-			c.fasthttp.Response.Header.DelClientCookie(key[i])
+			c.Cookie(&Cookie{
+				Name:    key[i],
+				Expires: time.Now().Add(-time.Hour * 24),
+				Value:   "",
+			})
 		}
 		return
 	}
 	c.fasthttp.Request.Header.VisitAllCookie(func(k, _ []byte) {
-		c.fasthttp.Response.Header.DelClientCookieBytes(k)
+		c.Cookie(&Cookie{
+			Name:    string(k),
+			Expires: time.Now().Add(-time.Hour * 24),
+			Value:   "",
+		})
 	})
 }
 
